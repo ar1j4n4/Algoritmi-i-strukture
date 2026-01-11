@@ -10,8 +10,8 @@ struct Cvor {
 	Pozicija next;
 };
 
-void Push(Pozicija, int);
-int Pop(Pozicija);
+int Push(Pozicija, int);
+int Pop(Pozicija, int*);
 int Postfiks(int, char, int);
 
 int main() {
@@ -30,67 +30,89 @@ int main() {
 
 	char buffer[32] = { 0 };
 	int x;
+	int status;
 
-	while (!feof(fp)) {
-
-		if (fscanf(fp, " %s", buffer) != 1)
-			break;
+	while (fscanf(fp, " %s", buffer) == 1) {
 
 		printf(" %s", buffer);
 
-		x = atoi(buffer); //string u int
+		x = atoi(buffer);
 
-		if ((x == 0) && (buffer[0] != '0')) {	// !='0' jer atoi('+')->0
+		if ((x == 0) && (buffer[0] != '0')) {
 			int q, r, s;
 
-			q = Pop(&head);
-			r = Pop(&head);
+			status = Pop(&head, &q);
+			if (status != 0) {
+				printf("\nGreška: stog je prazan, nema dovoljno operanada za operator '%c'\n", buffer[0]);
+				fclose(fp);
+				return -1;
+			}
+
+			status = Pop(&head, &r);
+			if (status != 0) {
+				printf("\nGreška: stog je prazan, nema dovoljno operanada za operator '%c'\n", buffer[0]);
+				fclose(fp);
+				return -1;
+			}
+
 			s = Postfiks(q, buffer[0], r);
 			Push(&head, s);
 
 		}
 		else {
-			Push(&head, x);
+			status = Push(&head, x);
+			if (status != 0) {
+				printf("\nGreška: element nije dodan na stog\n");
+				fclose(fp);
+				return -1;
+			}
 		}
+	}
+
+	fclose(fp);
+
+	if (head.next == NULL) {
+		printf("\nGreška: izraz je prazan\n");
+		return -1;
+	}
+
+	if (head.next->next != NULL) {
+		printf("\nGreška: postfiks izraz nije ispravan, stog sadrži više od jednog elementa\n");
+		return -1;
 	}
 
 	printf("\nRezultat: %d\n", head.next->element);
 	free(head.next);
 
-	fclose(fp);
+	return 0;
+}
+
+int Push(Pozicija P, int n) {
+	
+	Pozicija q = (Pozicija)malloc(sizeof(struct Cvor));
+	if (q == NULL) {
+		return -1;
+	}
+
+	q->element = n;
+	q->next = P->next;
+	P->next = q;
 
 	return 0;
 }
 
-void Push(Pozicija P, int n) {
-	
-	Pozicija q;
-	q = (Pozicija)malloc(sizeof(struct Cvor));
-	if (q == NULL) {
-		printf("Greska pri alokaciji memorije!\n");
-		return;
+int Pop(Pozicija P, int* n) {
+
+	if (P->next == NULL) {
+		return -1;
 	}
 
-	if (q) {
-		q->element = n;
-		q->next = P->next;
-		P->next = q;
-	}
+	Pozicija temp = P->next;
+	*n = temp->element;
+	P->next = temp->next;
+	free(temp);
 
-}
-
-int Pop(Pozicija P) {
-
-	Pozicija temp;
-	int n = 0;
-
-	if (P->next != NULL) {
-		temp = P->next;
-		P->next = temp->next;
-		n = temp->element;
-		free(temp);
-	}
-	return n;
+	return 0;
 }
 
 int Postfiks(int x, char operacija, int y) {
