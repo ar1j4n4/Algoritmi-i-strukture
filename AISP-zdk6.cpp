@@ -13,10 +13,10 @@ struct Cvor {
 };
 
 int GeneriranjeBrojeva();
-void PushStog(Pozicija, int);
-void PopStog(Pozicija);
-void EnqueueRed(Pozicija, int);
-void DequeueRed(Pozicija);
+int PushStog(Pozicija, int);
+int PopStog(Pozicija);
+int EnqueueRed(Pozicija, int);
+int DequeueRed(Pozicija);
 void IspisListe(Pozicija);
 
 int main() {
@@ -26,6 +26,7 @@ int main() {
 	red.next = NULL;
 
 	int opcija = 1;
+	int rezultat = 0;
 
 	srand((unsigned)time(NULL));
 
@@ -41,32 +42,48 @@ int main() {
 		switch (opcija) {
 
 		case 0:
-			printf("Program zavrsen.\n");
+			printf("Program završen.\n");
 			opcija = 0;
 			break;
 
 		case 1:
-			PushStog(&stog, GeneriranjeBrojeva());
+			rezultat = PushStog(&stog, GeneriranjeBrojeva());
+			if (rezultat == 0)
+				printf("Element uspješno dodan na stog.\n");
+			else
+				printf("Element nije dodan!\n");
 			IspisListe(stog.next);
 			break;
 
 		case 2:
-			PopStog(&stog);
+			rezultat = PopStog(&stog);
+			if (rezultat == 0)
+				printf("Element uspješno skinut sa stoga.\n");
+			else
+				printf("Stog je prazan, ne možemo skinuti element.\n");
 			IspisListe(stog.next);
 			break;
 
 		case 3:
-			EnqueueRed(&red, GeneriranjeBrojeva());
+			rezultat = EnqueueRed(&red, GeneriranjeBrojeva());
+			if (rezultat == 0)
+				printf("Element uspješno dodan u red.\n");
+			else
+				printf("Element nije dodan!\n");
 			IspisListe(red.next);
 			break;
 
 		case 4:
-			DequeueRed(&red);
+			rezultat = DequeueRed(&red);
+			if (rezultat == 0)
+				printf("Element uspješno maknut iz reda.\n");
+			else
+				printf("Red je prazan, ne možemo maknuti element.\n");
 			IspisListe(red.next);
 			break;
 
 		default:
-			printf("Opcija %d ne postoji. Pokusajte ponovno.\n", opcija);
+			printf("Opcija %d ne postoji. Pokušajte ponovno.\n", opcija);
 
 		}
 
@@ -92,50 +109,42 @@ void IspisListe(Pozicija P) {
 		P = P->next;
 	}
 
+	printf("\n");
 }
 
-void PushStog(Pozicija P, int broj) {
+int PushStog(Pozicija P, int broj) {
 
 	Pozicija temp;
 	temp = (Pozicija)malloc(sizeof(struct Cvor));
 	if (temp == NULL) {
-		printf("Greska pri alokaciji memorije!\n");
-		return;
+		return -1;
 	}
 
-	if (temp) {
-		temp->element = broj;
-		temp->next = P->next;
-		P->next = temp;
-	}
+	temp->element = broj;
+	temp->next = P->next;
+	P->next = temp;
 
+	return 0;
 }
 
-void PopStog(Pozicija P) {
+int PopStog(Pozicija P) {
 
 	if (P->next == NULL) {
-		printf("Stog je trenutno prazan.\n");
-		return;
+		return -1;
 	}
 
-	Pozicija temp;
+	Pozicija temp = P->next;
+	P->next = temp->next;
+	free(temp);
 
-	if (P->next != NULL) {
-
-		temp = P->next;
-		P->next = temp->next;
-
-		free(temp);
-	}
-
+	return 0;
 }
 
-void EnqueueRed(Pozicija P, int broj) {
+int EnqueueRed(Pozicija P, int broj) {
 
 	Pozicija temp = (Pozicija)malloc(sizeof(struct Cvor));
 	if (temp == NULL) {
-		printf("Greska pri alokaciji memorije!\n");
-		return;
+		return -1;
 	}
 
 	temp->element = broj;
@@ -151,17 +160,18 @@ void EnqueueRed(Pozicija P, int broj) {
 		zadnji->next = temp;
 	}
 
+	return 0;
 }
 
-void DequeueRed(Pozicija P) {
+int DequeueRed(Pozicija P) {
 
 	if (P->next == NULL) {
-		printf("\nRed je trenutno prazan.\n");
-		return;
+		return -1;
 	}
 
 	Pozicija temp = P->next;
 	P->next = temp->next;
-
 	free(temp);
+
+	return 0;
 }
