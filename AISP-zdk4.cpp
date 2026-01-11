@@ -50,12 +50,6 @@ int main() {
 
 void ucitajPolinom(Pozicija head) {
 
-    // Provjera da polinom nema vise od 1 head
-    if (head->next != NULL) {
-        printf("Greska! Polinom vec sadrzi elemente.\n");
-        return;
-    }
-
     FILE* fp = fopen("vjezba4.txt", "r");
     if (fp == NULL) {
         printf("Greska! Datoteka nije otvorena!\n");
@@ -136,86 +130,4 @@ void ispisPolinoma(Pozicija p) {
         }
         p = p->next;
     }
-    printf("\n");
-}
-
-// Funkcije zbrojPolinoma i umnozakPolinoma ostaju identicne tvojem originalu
-void zbrojPolinoma(Pozicija p1, Pozicija p2, Pozicija head3) {
-    Pozicija q = head3;
-    while (p1 != NULL && p2 != NULL) {
-        Pozicija novi = (Pozicija)malloc(sizeof(struct Cvor));
-        if (p1->eksponent > p2->eksponent) {
-            novi->koeficijent = p1->koeficijent;
-            novi->eksponent = p1->eksponent;
-            p1 = p1->next;
-        }
-        else if (p1->eksponent < p2->eksponent) {
-            novi->koeficijent = p2->koeficijent;
-            novi->eksponent = p2->eksponent;
-            p2 = p2->next;
-        }
-        else {
-            novi->koeficijent = p1->koeficijent + p2->koeficijent;
-            novi->eksponent = p1->eksponent;
-            p1 = p1->next;
-            p2 = p2->next;
-        }
-        if (novi->koeficijent != 0) {
-            novi->next = q->next;
-            q->next = novi;
-            q = novi;
-        }
-        else {
-            free(novi);
-        }
-    }
-
-    while (p1 != NULL) {
-        Pozicija novi = (Pozicija)malloc(sizeof(struct Cvor));
-        novi->koeficijent = p1->koeficijent;
-        novi->eksponent = p1->eksponent;
-        novi->next = q->next;
-        q->next = novi;
-        q = novi;
-        p1 = p1->next;
-    }
-
-    while (p2 != NULL) {
-        Pozicija novi = (Pozicija)malloc(sizeof(struct Cvor));
-        novi->koeficijent = p2->koeficijent;
-        novi->eksponent = p2->eksponent;
-        novi->next = q->next;
-        q->next = novi;
-        q = novi;
-        p2 = p2->next;
-    }
-}
-
-void umnozakPolinoma(Pozicija p1, Pozicija p2, Pozicija head4) {
-    for (Pozicija i = p1; i != NULL; i = i->next) {
-        for (Pozicija j = p2; j != NULL; j = j->next) {
-            int k = i->koeficijent * j->koeficijent;
-            int e = i->eksponent + j->eksponent;
-
-            Pozicija q = head4;
-            while ((q->next != NULL) && (q->next->eksponent > e))
-                q = q->next;
-
-            if ((q->next != NULL) && (q->next->eksponent == e)) {
-                q->next->koeficijent += k;
-                if (q->next->koeficijent == 0) {
-                    Pozicija temp = q->next;
-                    q->next = temp->next;
-                    free(temp);
-                }
-            }
-            else {
-                Pozicija novi = (Pozicija)malloc(sizeof(struct Cvor));
-                novi->koeficijent = k;
-                novi->eksponent = e;
-                novi->next = q->next;
-                q->next = novi;
-            }
-        }
-    }
-}
+    print
