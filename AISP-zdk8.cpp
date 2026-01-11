@@ -13,6 +13,7 @@ struct Cvor {
 int Push(Pozicija, int);
 int Pop(Pozicija, int*);
 int Postfiks(int, char, int);
+void ObrisiStog(Pozicija);
 
 int main() {
 
@@ -21,8 +22,7 @@ int main() {
 
 	printf("\nIzraz:\n");
 
-	FILE* fp = NULL;
-	fp = fopen("datoteka.txt", "r");
+	FILE* fp = fopen("datoteka.txt", "r");
 	if (fp == NULL) {
 		printf("Datoteka nije otvorena!\n");
 		return -1;
@@ -33,9 +33,7 @@ int main() {
 	int status;
 
 	while (fscanf(fp, " %s", buffer) == 1) {
-
 		printf(" %s", buffer);
-
 		x = atoi(buffer);
 
 		if ((x == 0) && (buffer[0] != '0')) {
@@ -44,6 +42,7 @@ int main() {
 			status = Pop(&head, &q);
 			if (status != 0) {
 				printf("\nGreška: stog je prazan, nema dovoljno operanada za operator '%c'\n", buffer[0]);
+				ObrisiStog(&head);
 				fclose(fp);
 				return -1;
 			}
@@ -51,6 +50,7 @@ int main() {
 			status = Pop(&head, &r);
 			if (status != 0) {
 				printf("\nGreška: stog je prazan, nema dovoljno operanada za operator '%c'\n", buffer[0]);
+				ObrisiStog(&head);
 				fclose(fp);
 				return -1;
 			}
@@ -58,11 +58,11 @@ int main() {
 			s = Postfiks(q, buffer[0], r);
 			Push(&head, s);
 
-		}
-		else {
+		} else {
 			status = Push(&head, x);
 			if (status != 0) {
 				printf("\nGreška: element nije dodan na stog\n");
+				ObrisiStog(&head);
 				fclose(fp);
 				return -1;
 			}
@@ -78,6 +78,7 @@ int main() {
 
 	if (head.next->next != NULL) {
 		printf("\nGreška: postfiks izraz nije ispravan, stog sadrži više od jednog elementa\n");
+		ObrisiStog(&head);
 		return -1;
 	}
 
@@ -88,54 +89,43 @@ int main() {
 }
 
 int Push(Pozicija P, int n) {
-	
 	Pozicija q = (Pozicija)malloc(sizeof(struct Cvor));
-	if (q == NULL) {
-		return -1;
-	}
-
+	if (q == NULL) return -1;
 	q->element = n;
 	q->next = P->next;
 	P->next = q;
-
 	return 0;
 }
 
 int Pop(Pozicija P, int* n) {
-
-	if (P->next == NULL) {
-		return -1;
-	}
-
+	if (P->next == NULL) return -1;
 	Pozicija temp = P->next;
 	*n = temp->element;
 	P->next = temp->next;
 	free(temp);
-
 	return 0;
 }
 
 int Postfiks(int x, char operacija, int y) {
-
 	int n = 0;
 	switch (operacija) {
-	case '+':
-		n = x + y;
-		break;
-	case '-':
-		n = x - y;
-		break;
-	case '*':
-		n = x * y;
-		break;
+	case '+': n = x + y; break;
+	case '-': n = x - y; break;
+	case '*': n = x * y; break;
 	case '/':
-		if (y != 0)
-			n = x / y;
-		else
-			printf("Nema dijeljenja s nulom!\n");
+		if (y != 0) n = x / y;
+		else printf("Nema dijeljenja s nulom!\n");
 		break;
-	default:
-		printf("Nepoznat operator u postfiks izrazu!\n");
+	default: printf("Nepoznat operator u postfiks izrazu!\n");
 	}
 	return n;
+}
+
+void ObrisiStog(Pozicija P) {
+	Pozicija temp;
+	while (P->next != NULL) {
+		temp = P->next;
+		P->next = temp->next;
+		free(temp);
+	}
 }
