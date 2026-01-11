@@ -91,7 +91,8 @@ int main() {
 			printf("Upisite element (prezime):\n");
 			scanf(" %s", prez);
 
-			if (izbrisiElement(&head, prez) == 0)
+			rezultat = izbrisiElement(&head, prez);
+			if (rezultat == 0)
 				printf("Element izbrisan.\n");
 			else
 				printf("Element nije pronaden.\n");
@@ -102,7 +103,12 @@ int main() {
 			char prez[20];
 			printf("Upisite element (prezime):\n");
 			scanf(" %s", prez);
-			dodajIza(&head, prez);
+
+			rezultat = dodajIza(&head, prez);
+			if (rezultat == 0)
+				printf("Element dodan.\n");
+			else
+				printf("Element nije dodan.\n");
 			break;
 		}
 
@@ -110,23 +116,37 @@ int main() {
 			char prez[20];
 			printf("Upisite element (prezime):\n");
 			scanf(" %s", prez);
-			dodajIspred(&head, prez);
+
+			rezultat = dodajIspred(&head, prez);
+			if (rezultat == 0)
+				printf("Element dodan.\n");
+			else
+				printf("Element nije dodan.\n");
 			break;
 		}
 
 		case 8:
-			sortirajListu(&head);
-			printf("Lista sortirana po prezimenima.\n");
+			rezultat = sortirajListu(&head);
+			if (rezultat == 0)
+				printf("Lista sortirana.\n");
+			else
+				printf("Lista nije sortirana.\n");
 			break;
 
 		case 9:
-			upisiUDatoteku(&head);
-			printf("Lista je upisana u datoteku.\n");
+			rezultat = upisiUDatoteku(&head);
+			if (rezultat == 0)
+				printf("Lista je upisana u datoteku.\n");
+			else
+				printf("Upis nije uspio.\n");
 			break;
 
 		case 10:
-			citajDatoteku(&head);
-			printf("Elementi liste procitani.\n");
+			rezultat = citajDatoteku(&head);
+			if (rezultat == 0)
+				printf("Elementi ucitani.\n");
+			else
+				printf("Citanje nije uspjelo.\n");
 			break;
 
 		}
@@ -142,21 +162,14 @@ Pozicija stvoriCvor() {
 }
 
 void ispuniPodacima(Pozicija p) {
-
 	printf("Upisite podatke (ime prezime godina):\n");
 	scanf(" %s %s %d", p->ime, p->prezime, &p->godRodenja);
-
 }
 
 int ubaciNaprijed(Pozicija prev) {
-
-	//Pozicija p = (Pozicija)malloc(sizeof(Osoba)); 
 	Pozicija p = stvoriCvor();
-
-	if (p == NULL) {
-		printf("Greska!\n");
+	if (p == NULL)
 		return -1;
-	}
 
 	ispuniPodacima(p);
 
@@ -164,21 +177,16 @@ int ubaciNaprijed(Pozicija prev) {
 	prev->next = p;
 
 	return 0;
-
 }
 
 int ubaciNazad(Pozicija prev) {
-
-	while (prev->next != NULL) {
+	while (prev->next != NULL)
 		prev = prev->next;
-	}
 
 	return ubaciNaprijed(prev);
-
 }
 
 int ispisiListu(Pozicija p) {
-
 	if (p->next == NULL) {
 		printf("Lista je prazna!\n");
 		return 0;
@@ -188,35 +196,27 @@ int ispisiListu(Pozicija p) {
 		p = p->next;
 		printf(" %s %s %d\n", p->ime, p->prezime, p->godRodenja);
 	}
-
 	printf("\n");
-
 	return 0;
-
 }
 
-Pozicija pronadiElement(Pozicija p, char* prez) { 
-
+Pozicija pronadiElement(Pozicija p, char* prez) {
 	p = p->next;
 
 	while (p != NULL) {
-		if (strcmp(p->prezime, prez) == 0) {
+		if (strcmp(p->prezime, prez) == 0)
 			return p;
-		}
 		p = p->next;
 	}
 
-	return 0;
-
+	return NULL;
 }
 
 int izbrisiElement(Pozicija head, char* prez) {
-
 	Pozicija prev = head;
 	Pozicija current = head->next;
 
 	while (current != NULL) {
-
 		if (strcmp(current->prezime, prez) == 0) {
 			prev->next = current->next;
 			free(current);
@@ -229,30 +229,22 @@ int izbrisiElement(Pozicija head, char* prez) {
 }
 
 int izbrisiSve(Pozicija p) {
-
 	while (p->next != NULL) {
 		Pozicija target = p->next;
 		p->next = target->next;
 		free(target);
 	}
-
 	return 0;
-
 }
 
 int dodajIza(Pozicija head, char* prezime) {
-
 	Pozicija p = pronadiElement(head, prezime);
-	if (p == NULL) {
-		printf("Element nije pronaden!\n");
+	if (p == NULL)
 		return -1;
-	}
 
 	Pozicija novi = stvoriCvor();
-	if (novi == NULL) {
-		printf("Greska!\n");
+	if (novi == NULL)
 		return -1;
-	}
 
 	ispuniPodacima(novi);
 
@@ -260,11 +252,9 @@ int dodajIza(Pozicija head, char* prezime) {
 	p->next = novi;
 
 	return 0;
-
 }
 
 int dodajIspred(Pozicija head, char* prezime) {
-
 	Pozicija prev = head;
 	Pozicija current = head->next;
 
@@ -273,16 +263,12 @@ int dodajIspred(Pozicija head, char* prezime) {
 		current = current->next;
 	}
 
-	if (current == NULL) {
-		printf("Element nije pronaden.\n");
+	if (current == NULL)
 		return -1;
-	}
 
 	Pozicija novi = stvoriCvor();
-	if (novi == NULL) {
-		printf("Greska!\n");
+	if (novi == NULL)
 		return -1;
-	}
 
 	ispuniPodacima(novi);
 
@@ -290,14 +276,11 @@ int dodajIspred(Pozicija head, char* prezime) {
 	prev->next = novi;
 
 	return 0;
-
 }
 
 int sortirajListu(Pozicija head) {	//Bubble Sort
-
-	if ((head->next == NULL) || (head->next->next == NULL)) {
+	if ((head->next == NULL) || (head->next->next == NULL))
 		return 0;
-	}
 
 	int zamjena;
 	do {
@@ -321,17 +304,12 @@ int sortirajListu(Pozicija head) {	//Bubble Sort
 	} while (zamjena);
 
 	return 0;
-
 }
 
 int upisiUDatoteku(Pozicija head) {
-
-	FILE* fp = NULL;
-	fp = fopen("datoteka.txt", "w");
-	if (fp == NULL) {
-		printf("Greska! Datoteka nije otvorena!\n");
+	FILE* fp = fopen("datoteka.txt", "w");
+	if (fp == NULL)
 		return -1;
-	}
 
 	Pozicija current = head->next;
 	while (current != NULL) {
@@ -340,39 +318,31 @@ int upisiUDatoteku(Pozicija head) {
 	}
 
 	fclose(fp);
-
 	return 0;
-
 }
 
 int citajDatoteku(Pozicija head) {
-
-	FILE* fp = NULL;
-	fp = fopen("datoteka.txt", "r");
-	if (fp == NULL) {
-		printf("Greska! Datoteka nije otvorena!\n");
+	FILE* fp = fopen("datoteka.txt", "r");
+	if (fp == NULL)
 		return -1;
-	}
 
 	char _ime[20];
 	char _prezime[20];
 	int godina = 0;
 
-	while (!feof) {
+	while (fscanf(fp, " %s %s %d", _ime, _prezime, &godina) == 3) {
 		Pozicija novi = stvoriCvor();
-		if (!novi) {
-			printf("Greska!\n");
+		if (!novi)
 			return -1;
-		}
+
 		strcpy(novi->ime, _ime);
 		strcpy(novi->prezime, _prezime);
 		novi->godRodenja = godina;
 		novi->next = NULL;
 
 		Pozicija temp = head;
-		while (temp->next != NULL) {
+		while (temp->next != NULL)
 			temp = temp->next;
-		}
 		temp->next = novi;
 	}
 
