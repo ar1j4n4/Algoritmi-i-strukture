@@ -15,6 +15,7 @@ void ucitajPolinom(Pozicija);
 void ispisPolinoma(Pozicija);
 void zbrojPolinoma(Pozicija, Pozicija, Pozicija);
 void umnozakPolinoma(Pozicija, Pozicija, Pozicija);
+void obrisiListu(Pozicija);
 
 int main() {
 
@@ -45,6 +46,11 @@ int main() {
     printf("Umnozak polinoma:\n");
     ispisPolinoma(head4.next);
 
+    obrisiListu(&head1);
+    obrisiListu(&head2);
+    obrisiListu(&head3);
+    obrisiListu(&head4);
+
     return 0;
 }
 
@@ -57,12 +63,19 @@ void ucitajPolinom(Pozicija head) {
     }
 
     Pozicija q, i;
-    int k, e;
 
     while (!feof(fp)) {
         q = (Pozicija)malloc(sizeof(struct Cvor));
+        if (q == NULL) {
+            printf("Greska pri alokaciji memorije!\n");
+            fclose(fp);
+            return;
+        }
 
-        fscanf(fp, " %d %d", &q->koeficijent, &q->eksponent);
+        if (fscanf(fp, " %d %d", &q->koeficijent, &q->eksponent) != 2) {
+            free(q);
+            break;
+        }
 
         if (q->koeficijent == 0) {
             free(q);
@@ -130,4 +143,16 @@ void ispisPolinoma(Pozicija p) {
         }
         p = p->next;
     }
-    print
+    printf("\n");
+}
+
+void obrisiListu(Pozicija head) {
+
+    Pozicija temp;
+
+    while (head->next != NULL) {
+        temp = head->next;
+        head->next = temp->next;
+        free(temp);
+    }
+}
