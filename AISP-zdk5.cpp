@@ -10,15 +10,15 @@ struct Cvor {
 	Pozicija next;
 };
 
-void citanjeDatoteke(Pozicija);
+int citanjeDatoteke(Pozicija);
 void ispisListe(Pozicija);
-void unija(Pozicija, Pozicija, Pozicija);
-void presjek(Pozicija, Pozicija, Pozicija);
+int unija(Pozicija, Pozicija, Pozicija);
+int presjek(Pozicija, Pozicija, Pozicija);
 void obrisiListu(Pozicija);
 
 int main() {
 
-	Pozicija head1, head2, headU, headP;
+	Pozicija head1 = NULL, head2 = NULL, headU = NULL, headP = NULL;
 
 	head1 = (Pozicija)malloc(sizeof(struct Cvor));
 	head2 = (Pozicija)malloc(sizeof(struct Cvor));
@@ -26,6 +26,10 @@ int main() {
 	headP = (Pozicija)malloc(sizeof(struct Cvor));
 
 	if (!head1 || !head2 || !headU || !headP) {
+		if (head1) free(head1);
+		if (head2) free(head2);
+		if (headU) free(headU);
+		if (headP) free(headP);
 		printf("Greska pri alokaciji!\n");
 		return -1;
 	}
@@ -35,8 +39,17 @@ int main() {
 	headU->next = NULL;
 	headP->next = NULL;
 
-	citanjeDatoteke(head1);
-	citanjeDatoteke(head2);
+	if (citanjeDatoteke(head1) != 0 || citanjeDatoteke(head2) != 0) {
+		obrisiListu(head1);
+		obrisiListu(head2);
+		obrisiListu(headU);
+		obrisiListu(headP);
+		free(head1);
+		free(head2);
+		free(headU);
+		free(headP);
+		return -1;
+	}
 
 	printf("\nPrva lista:\n");
 	ispisListe(head1->next);
@@ -44,11 +57,33 @@ int main() {
 	printf("\nDruga lista:\n");
 	ispisListe(head2->next);
 
-	unija(head1->next, head2->next, headU);
+	if (unija(head1->next, head2->next, headU) != 0) {
+		obrisiListu(head1);
+		obrisiListu(head2);
+		obrisiListu(headU);
+		obrisiListu(headP);
+		free(head1);
+		free(head2);
+		free(headU);
+		free(headP);
+		return -1;
+	}
+
 	printf("\nUnija:\n");
 	ispisListe(headU->next);
 
-	presjek(head1->next, head2->next, headP);
+	if (presjek(head1->next, head2->next, headP) != 0) {
+		obrisiListu(head1);
+		obrisiListu(head2);
+		obrisiListu(headU);
+		obrisiListu(headP);
+		free(head1);
+		free(head2);
+		free(headU);
+		free(headP);
+		return -1;
+	}
+
 	printf("\nPresjek:\n");
 	ispisListe(headP->next);
 
@@ -65,7 +100,7 @@ int main() {
 	return 0;
 }
 
-void citanjeDatoteke(Pozicija P) {
+int citanjeDatoteke(Pozicija P) {
 
 	FILE* fp = NULL;
 	char datoteka[20];
@@ -76,22 +111,15 @@ void citanjeDatoteke(Pozicija P) {
 	fp = fopen(datoteka, "r");
 	if (fp == NULL) {
 		printf("Greska! Datoteka nije otvorena!\n");
-		return;
+		return 1;
 	}
 
 	Pozicija q, temp;
-	while (!feof(fp)) {
+	while (fscanf(fp, " %d", &((q = (Pozicija)malloc(sizeof(struct Cvor)))->element)) == 1) {
 
-		q = (Pozicija)malloc(sizeof(struct Cvor));
-		if (q == NULL) {
-			printf("Greska pri alokaciji memorije!\n");
+		if (!q) {
 			fclose(fp);
-			return;
-		}
-
-		if (fscanf(fp, " %d", &q->element) != 1) {
-			free(q);
-			break;
+			return 2;
 		}
 
 		temp = P;
@@ -103,7 +131,9 @@ void citanjeDatoteke(Pozicija P) {
 		q->next = temp->next;
 		temp->next = q;
 	}
+
 	fclose(fp);
+	return 0;
 }
 
 void ispisListe(Pozicija P) {
@@ -114,7 +144,7 @@ void ispisListe(Pozicija P) {
 	}
 }
 
-void unija(Pozicija L1, Pozicija L2, Pozicija U) {
+int unija(Pozicija L1, Pozicija L2, Pozicija U) {
 
 	Pozicija q, temp;
 	int elementU = 0;
@@ -135,10 +165,7 @@ void unija(Pozicija L1, Pozicija L2, Pozicija U) {
 		}
 
 		q = (Pozicija)malloc(sizeof(struct Cvor));
-		if (q == NULL) {
-			printf("Greska pri alokaciji memorije!\n");
-			return;
-		}
+		if (!q) return 1;
 
 		q->element = elementU;
 		q->next = U->next;
@@ -153,10 +180,7 @@ void unija(Pozicija L1, Pozicija L2, Pozicija U) {
 
 	while (temp != NULL) {
 		q = (Pozicija)malloc(sizeof(struct Cvor));
-		if (q == NULL) {
-			printf("Greska pri alokaciji memorije!\n");
-			return;
-		}
+		if (!q) return 1;
 
 		q->element = temp->element;
 		q->next = U->next;
@@ -164,9 +188,11 @@ void unija(Pozicija L1, Pozicija L2, Pozicija U) {
 		U = q;
 		temp = temp->next;
 	}
+
+	return 0;
 }
 
-void presjek(Pozicija L1, Pozicija L2, Pozicija P) {
+int presjek(Pozicija L1, Pozicija L2, Pozicija P) {
 
 	Pozicija q;
 
@@ -177,10 +203,7 @@ void presjek(Pozicija L1, Pozicija L2, Pozicija P) {
 			L2 = L2->next;
 		else {
 			q = (Pozicija)malloc(sizeof(struct Cvor));
-			if (q == NULL) {
-				printf("Greska pri alokaciji memorije!\n");
-				return;
-			}
+			if (!q) return 1;
 
 			q->element = L1->element;
 			q->next = P->next;
@@ -191,6 +214,8 @@ void presjek(Pozicija L1, Pozicija L2, Pozicija P) {
 			L2 = L2->next;
 		}
 	}
+
+	return 0;
 }
 
 void obrisiListu(Pozicija head) {
@@ -203,3 +228,4 @@ void obrisiListu(Pozicija head) {
 		free(temp);
 	}
 }
+```
